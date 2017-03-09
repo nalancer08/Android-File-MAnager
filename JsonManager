@@ -1,0 +1,59 @@
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+
+/**
+ * Created by Erick Sanchez on 28/10/2016.
+ * CEO & CTO App Builders 
+ * This class have the objective to be deal with JSON's
+ */
+
+public class JsonManager {
+
+	/**
+    * Method to convert a string into JSONObject
+    * @param content: String with the content to be JSONObject
+    */
+    @Nullable
+    public static JSONObject stringToJSONObject(String content) {
+
+        JSONObject obj = null;
+
+        try {
+            obj = new JSONObject(content);
+        } catch( Throwable t ) {
+            Log.e("AB_DEV", "Couldnt parse information to JSON Object");
+        }
+        return obj;
+    }
+
+    /**
+    * Method to convert a string into JSONArray
+    * @param content: String with the content to be JSONObject
+    */
+    @Nullable
+    public static JSONArray stringToJSONArray(String content) {
+
+        JSONArray array = null;
+        try {
+            array = new JSONArray(content);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("AB_DEV", "Couldnt parse information to JSON Array");
+        }
+        return array;
+    }
+}
