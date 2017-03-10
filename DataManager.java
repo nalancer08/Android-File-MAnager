@@ -35,7 +35,7 @@ public class DataManager extends FileManager, Crypher, JsonManager {
     * @prama fileName: Name of the file to append the content
     * @param content: The content to be write o append
     */    
-    protected void saveData( String folderName, String fileName, String content ) {
+    public void saveData(String folderName, String fileName, String content) {
         
         try {
 
@@ -49,12 +49,34 @@ public class DataManager extends FileManager, Crypher, JsonManager {
     }
 
     /**
+	* This method use simpleEncryption of Crypher, and then save data in the file
+	* @param folderName: Folder to take the file
+    * @prama fileName: Name of the file to append the content
+    * @param content: The content to be write o append
+    */
+    public void saveSecureData(String folderName, String fileName, String content) {
+
+    	try {
+
+    		Crypher crypher = new Crypher();
+    		KeyChain key = crypher.256Key(this.context);
+    		FileWriter file = this.getFileWriter(folderName, fileName);
+    		file.write(crypher.simpleEncryption(key, content));
+            file.flush();
+            file.close();
+
+    	} catch (IOException e) {
+    		Log.e("AB_DEV", "Error in writing: " + e.getLocalizedMessage());
+    	}
+    }
+
+    /**
     * Method to get saved raw data in a file
     * @param folderName: Folder to take the file
     * @prama fileName: Name of the file to read the content
     */
     @Nullable
-    protected String getData( String folderName, String fileName ) {
+    public String getData(String folderName, String fileName) {
         
         try {
 
@@ -73,6 +95,32 @@ public class DataManager extends FileManager, Crypher, JsonManager {
         return null;
     }
 
+    /**
+	* This method get saved encrypt data, and then uses simpleDecryption of Crypher
+	* @param folderName: Folder to take the file
+    * @prama fileName: Name of the file to read the content
+    */
+    public String getSecureData(String folderName, String fileName) {
+
+    	try {
+
+            File f = this.getFile(folderName, fileName);
+            FileInputStream is = new FileInputStream(f);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+
+            Crypher crypher = new Crypher();
+    		KeyChain key = crypher.256Key(this.context);
+            return new String(crypher.simpleDecryption(key, buffer));
+
+        } catch (IOException e) {
+            Log.e("EB_DEV", "Error in reading: " + e.getLocalizedMessage());
+        }
+
+        return null;
+    }
 
     /**
     * Method to get data from assets folder
@@ -80,7 +128,7 @@ public class DataManager extends FileManager, Crypher, JsonManager {
     * @param codification: Type of codification for file
     */
     @Nullable
-    public String getDataFromAssets( String fileName, String codification ) {
+    public String getDataFromAssets(String fileName, String codification) {
         try {
             InputStream is = context.getAssets().open(fileName);
             int size = is.available();
@@ -94,13 +142,12 @@ public class DataManager extends FileManager, Crypher, JsonManager {
         }
     }
 
-
     /**
     * Method to get data from assets folder with default codification
     * @param fileName: Name of the fiel into the folder
     */
     @Nullable
-    public String getDataFromAssets( String fileName ) {
+    public String getDataFromAssets(String fileName) {
 
         return this.getDataFromAssets(fileName, "UTF-8");
     }
@@ -110,7 +157,7 @@ public class DataManager extends FileManager, Crypher, JsonManager {
     * @param fileName: Name of the fiel into the folder
     */
     @Nullable
-    public String getDataFromAssets2( String fileName ) {
+    public String getDataFromAssets2(String fileName) {
         try {
             InputStream is = context.getAssets().open(fileName);
             Writer writer = new StringWriter();
