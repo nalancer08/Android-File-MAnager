@@ -1,0 +1,128 @@
+package com.appbuilders.libraries;
+
+import android.content.Context;
+import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+
+/**
+ * Created by Erick Sanchez on 28/10/2016.
+ * CEO & CTO App Builders 
+ * This class gonna be the security layer
+ */
+
+public class Crypher {
+
+	/**
+	* This method do a 256 key for encrypt and decrypt
+	* @param context: Application context
+	*/
+	public KeyChain 256(Context context) {
+		
+		return new SharedPrefsBackedKeyChain(context, CryptoConfig.KEY_256);
+	}
+
+	/**
+	* This method make a basic encryptation, just use it for simple text
+	* @param key: KeyChain, that have to be storaged in some place
+	* @param content: String with the content to be hashed
+	*/
+	public byte[] simpleEncrypt(KeyChain key, String content) {
+
+		Crypto crypto = androidConceal.get().createDefaultCrypto(key);
+		return crypto.encrypt(content);
+	}
+
+	/**
+	* This method make a basic decryption, just use it for simple text
+	* @param key: KeyChain, that have to be storaged in some place
+	* @param encryptText: It's the data that have to be decrypted
+	*/
+	public byte[] simpleDecrypt(KeyChain key, byte[] encryptText) {
+		
+		Crypto crypto = androidConceal.get().createDefaultCrypto(key);
+		return crypto.decrypt(encryptText);
+	}
+
+	/**
+	* This method make a full encryption, used it for bigger files
+	* @param file: File to save the information
+	* @param content: String with the contn to be encrypted
+	* @param key: KeyChain, that have to be storaged in some place
+	* @param entity: Entity, that have to be created previusly, with string_id
+	*/
+	public void encryption(File file, String content, KeyChain key, String entity) {
+		
+		Crypto crypto = androidConceal.get().createDefaultCrypto(key);
+		if ( !crypto.isAvailable() ) {
+			return;
+		}
+
+		OutputStream fileStream = new BufferedOutputStream(new FileWriter(file));
+		OutputStream outputStream = crypto.getCipherOutputStream(fileStream, Entity.create(entity));
+		outputStream.write(content);
+		outputStream.close();
+	}
+
+	/**
+	* This method make a full decrytion, used to decrypt data, that was encryp by encrytion
+	* @param file: File to read the data
+	* @param key: keyChain, that have to be storaged in some place
+	* @param entity: Entity, that have to be created previusly, with string_id
+	*/
+	public void decryption(File file, KeyChain key, Entity entity) {
+
+		int read;
+		byte[] buffer = new byte[1024];
+
+		Crypto crypto = AndroidConceal.get().createDefaultCrypto(key);
+		FileInputStream fileStream = new FileInputStream(file);
+		InputStream inputStream = crypto.getCipherInputStream(fileStream, Entity.create(entity));
+
+		while( (read = inputStream.read(buffer)) != -1 ) {
+			//out.write(buffer, 0, read);
+		}
+
+		inputStream.close();
+	}
+
+	/**
+	* This method allow a way to check if yout encryptation is correct and can be crypted and decrypted 
+	* @param file: File to write/read the data
+	* @param content: bytes taht contains the text that you gonna encryot
+	* @param key: KeyChain, that have to be storaged in some place
+	* @param entity: Entity, that have to be created previusly, with string_id
+	*/
+	public void integrity(File file, byte[] content, KeyChain key, Entity entity) {
+
+		int read;
+		byte[] buffer = new byte[1024];
+
+		Crypto crypto = AndroidConceal.get().createDefaultCrypto(key);
+		OutputStream outputStream = crypto.getMacOutputStream(fileStream, entity);
+		outputStream.write(content);
+		outputStream.close();
+
+		InputStream inputStream = crypto.getMacInputStream(fileStream, entity);
+		while( (read = inputStream.read(buffer)) != -1 ) {
+			//out.write(buffer, 0, read);
+		}
+		inputStream.close();
+	}
+}
