@@ -32,15 +32,15 @@ public class DataManager extends FileManager, Crypher, JsonManager {
 	/**
     * Method to save data into a file
     * @param folderName: Folder to take the file
-    * @prama fileName: Name of the file to append the content
-    * @param content: The content to be write o append
+    * @prama fileName: Name of the file to append the data
+    * @param data: The data to be write o append
     */    
-    public void saveData(String folderName, String fileName, String content) {
+    public void saveData(String folderName, String fileName, String data) {
         
         try {
 
             FileWriter file = this.getFileWriter(folderName, fileName);
-            file.write(content);
+            file.write(data);
             file.flush();
             file.close();
         } catch (IOException e) {
@@ -51,17 +51,17 @@ public class DataManager extends FileManager, Crypher, JsonManager {
     /**
 	* This method use simpleEncryption of Crypher, and then save data in the file
 	* @param folderName: Folder to take the file
-    * @prama fileName: Name of the file to append the content
-    * @param content: The content to be write o append
+    * @prama fileName: Name of the file to append the data
+    * @param data: The data to be write o append
     */
-    public void saveSecureData(String folderName, String fileName, String content) {
+    public void saveSecureData(String folderName, String fileName, String data) {
 
     	try {
 
     		Crypher crypher = new Crypher();
     		KeyChain key = crypher.256Key(this.context);
     		FileWriter file = this.getFileWriter(folderName, fileName);
-    		file.write(crypher.simpleEncryption(key, content));
+    		file.write(crypher.simpleEncryption(key, data));
             file.flush();
             file.close();
 
@@ -70,10 +70,27 @@ public class DataManager extends FileManager, Crypher, JsonManager {
     	}
     }
 
+
+    public void saveMd5File(String folderName, String fileName, String data) {
+
+        File f = this.getFile(folderName, fileName);
+        FileInputStream fis = null;
+        DigestInputStream digestInputStream;
+        try {
+
+        	fis = new FileInputStream(file);
+        	MessageDigest md = MessageDigest.getInstance("MD5");
+        	digestInputStream = new DigestInputStream(fis, md);
+        	byte[] buffer = new byte[256 * 1025];
+        	while(  )
+        } catch(IOException e) {}
+
+    }
+
     /**
     * Method to get saved raw data in a file
     * @param folderName: Folder to take the file
-    * @prama fileName: Name of the file to read the content
+    * @prama fileName: Name of the file to read the data
     */
     @Nullable
     public String getData(String folderName, String fileName) {
@@ -98,7 +115,7 @@ public class DataManager extends FileManager, Crypher, JsonManager {
     /**
 	* This method get saved encrypt data, and then uses simpleDecryption of Crypher
 	* @param folderName: Folder to take the file
-    * @prama fileName: Name of the file to read the content
+    * @prama fileName: Name of the file to read the data
     */
     public String getSecureData(String folderName, String fileName) {
 

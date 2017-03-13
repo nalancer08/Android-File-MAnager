@@ -1,6 +1,4 @@
 package com.appbuilders.libraries;
-
-import android.content.Context;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,6 +27,10 @@ import java.io.Writer;
 
 public class Crypher {
 
+	/****************************************************************
+	*						FACEBOOK CONCEAL 						*									
+	*****************************************************************/
+
 	/**
 	* This method do a 256 key for encrypt and decrypt
 	* Depends from Facebook.Conceal
@@ -43,12 +45,12 @@ public class Crypher {
 	* This method make a basic encryptation, just use it for simple text
 	* Depends from Facebook.Conceal
 	* @param key: KeyChain, that have to be storaged in some place
-	* @param content: String with the content to be hashed
+	* @param data: String with the data to be hashed
 	*/
-	public byte[] simpleEncryption(KeyChain key, String content) {
+	public byte[] simpleEncryption(KeyChain key, String data) {
 
 		Crypto crypto = androidConceal.get().createDefaultCrypto(key);
-		return crypto.encrypt(content);
+		return crypto.encrypt(data);
 	}
 
 	/**
@@ -67,11 +69,11 @@ public class Crypher {
 	* This method make a full encryption, used it for bigger files
 	* Depends from Facebook.Conceal
 	* @param file: File to save the information
-	* @param content: String with the contn to be encrypted
+	* @param data: String with the contn to be encrypted
 	* @param key: KeyChain, that have to be storaged in some place
 	* @param entity: Entity, that have to be created previusly, with string_id
 	*/
-	public void encryption(File file, String content, KeyChain key, String entity) {
+	public void encryption(File file, String data, KeyChain key, String entity) {
 		
 		Crypto crypto = androidConceal.get().createDefaultCrypto(key);
 		if ( !crypto.isAvailable() ) {
@@ -80,7 +82,7 @@ public class Crypher {
 
 		OutputStream fileStream = new BufferedOutputStream(new FileWriter(file));
 		OutputStream outputStream = crypto.getCipherOutputStream(fileStream, Entity.create(entity));
-		outputStream.write(content);
+		outputStream.write(data);
 		outputStream.close();
 	}
 
@@ -111,18 +113,18 @@ public class Crypher {
 	* This method allow a way to check if yout encryptation is correct and can be crypted and decrypted
 	* Depends from Facebook.Conceal 
 	* @param file: File to write/read the data
-	* @param content: bytes taht contains the text that you gonna encryot
+	* @param data: bytes taht contains the text that you gonna encrypt
 	* @param key: KeyChain, that have to be storaged in some place
 	* @param entity: Entity, that have to be created previusly, with string_id
 	*/
-	public void integrity(File file, byte[] content, KeyChain key, Entity entity) {
+	public void integrity(File file, byte[] data, KeyChain key, Entity entity) {
 
 		int read;
 		byte[] buffer = new byte[1024];
 
 		Crypto crypto = AndroidConceal.get().createDefaultCrypto(key);
 		OutputStream outputStream = crypto.getMacOutputStream(fileStream, entity);
-		outputStream.write(content);
+		outputStream.write(data);
 		outputStream.close();
 
 		InputStream inputStream = crypto.getMacInputStream(fileStream, entity);
@@ -131,4 +133,59 @@ public class Crypher {
 		}
 		inputStream.close();
 	}
+
+	/****************************************************************
+	*						CRYPHER OWN METHODS						*									
+	*****************************************************************/
+
+	public String encryptMd2ToString(String data) {
+
+		return encryptMd2(data.getBytes());
+	}
+
+	public String encryptMd2ToString(byte[] data) {
+
+		return bytesToHexString(encryptMd2(data));
+	}
+
+	public byte[] encryptMd2(byte[] data) {
+
+		return hashTemplate(data, "MD2");
+	}
+
+	public String encryptMd5ToString(String data) {
+
+		return encryptMd5ToString(data.getBytes());
+	}
+
+	public String encryptMd5ToString(String data, String salt) {
+
+		return bytesToHexString(encryptMd5((data + salt).getBytes()));
+	}
+
+	public String encryptMd5ToString(byte[] data) {
+
+		return bytesToHexString(encryptMd5(data));
+	}
+
+	public String encryptMd5ToString(byte[] data, byte[] salt) {
+
+		if ( data == null || salt == null ) {
+			return null;
+		}
+
+		byte[] dataSalt = new byte[data.length + salt.length];
+		System.arraycopy(data, 0, dataSalt, 0, data.length);
+		System.arraycopy(salt, 0, dataSalt, data.length, salt.length);
+		return bytesToHexString(encryptMd5(dataSalt));
+	}
+
+	public byte[] encryptMd5(byte[] data) {
+
+		return hashTemplate(data, "MD5");
+	}
+
+	public 
+
+
 }
