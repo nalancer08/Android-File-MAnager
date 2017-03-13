@@ -30,6 +30,29 @@ import java.io.Writer;
 public class DataManager extends FileManager, Crypher, JsonManager {
 
 	/**
+    * Method to save data into a file and return the file
+    * @param folderName: Folder to take the file
+    * @prama fileName: Name of the file to append the data
+    * @param data: The data to be write o append
+    */    
+    public File saveData(String folderName, String fileName, String data) {
+        
+        try {
+
+            FileWriter file = this.getFileWriter(folderName, fileName);
+            file.write(data);
+            file.flush();
+            file.close();
+            return file;
+        } catch (IOException e) {
+            Log.e("AB_DEV", "Error in writing: " + e.getLocalizedMessage());
+        }
+
+        return null;
+    }
+
+
+    /**
     * Method to save data into a file
     * @param folderName: Folder to take the file
     * @prama fileName: Name of the file to append the data
@@ -38,7 +61,6 @@ public class DataManager extends FileManager, Crypher, JsonManager {
     public void saveData(String folderName, String fileName, String data) {
         
         try {
-
             FileWriter file = this.getFileWriter(folderName, fileName);
             file.write(data);
             file.flush();
@@ -58,8 +80,8 @@ public class DataManager extends FileManager, Crypher, JsonManager {
 
     	try {
 
-    		Crypher crypher = new Crypher();
-    		KeyChain key = crypher.256Key(this.context);
+    		Crypher crypher = new Crypher(this.context);
+    		KeyChain key = crypher.256Key();
     		FileWriter file = this.getFileWriter(folderName, fileName);
     		file.write(crypher.simpleEncryption(key, data));
             file.flush();
@@ -68,23 +90,6 @@ public class DataManager extends FileManager, Crypher, JsonManager {
     	} catch (IOException e) {
     		Log.e("AB_DEV", "Error in writing: " + e.getLocalizedMessage());
     	}
-    }
-
-
-    public void saveMd5File(String folderName, String fileName, String data) {
-
-        File f = this.getFile(folderName, fileName);
-        FileInputStream fis = null;
-        DigestInputStream digestInputStream;
-        try {
-
-        	fis = new FileInputStream(file);
-        	MessageDigest md = MessageDigest.getInstance("MD5");
-        	digestInputStream = new DigestInputStream(fis, md);
-        	byte[] buffer = new byte[256 * 1025];
-        	while(  )
-        } catch(IOException e) {}
-
     }
 
     /**

@@ -27,6 +27,12 @@ import java.io.Writer;
 
 public class Crypher {
 
+	private Context context;
+
+	public Crypher(Context context) {
+		this.context = context;
+	}
+
 	/****************************************************************
 	*						FACEBOOK CONCEAL 						*									
 	*****************************************************************/
@@ -36,9 +42,9 @@ public class Crypher {
 	* Depends from Facebook.Conceal
 	* @param context: Application context
 	*/
-	public KeyChain 256Key(Context context) {
+	public KeyChain 256Key() {
 		
-		return new SharedPrefsBackedKeyChain(context, CryptoConfig.KEY_256);
+		return new SharedPrefsBackedKeyChain(this.context, CryptoConfig.KEY_256);
 	}
 
 	/**
@@ -138,36 +144,66 @@ public class Crypher {
 	*						CRYPHER OWN METHODS						*									
 	*****************************************************************/
 
+	/**
+	* This method encrypt a String input into a MD2 String
+	* @param data: String with the information to be encrypted
+	*/
 	public String encryptMd2ToString(String data) {
 
-		return encryptMd2(data.getBytes());
+		return encryptMd2ToString(data.getBytes());
 	}
 
+	/**
+	* This method encrypt a byte[] input into a MD2 String
+	* @param data: String with the information to be encrypted
+	*/
 	public String encryptMd2ToString(byte[] data) {
 
 		return bytesToHexString(encryptMd2(data));
 	}
 
+	/**
+	* This method return MD2 byte[] with the encrypted information
+	* @param data: byte[] with the information to be encrypted
+	*/
 	public byte[] encryptMd2(byte[] data) {
 
 		return hashTemplate(data, "MD2");
 	}
 
+	/**
+	* This method encrypt input String into a MD5 String
+	* @param data: String with the information to be encrypted
+	*/
 	public String encryptMd5ToString(String data) {
 
 		return encryptMd5ToString(data.getBytes());
 	}
 
+	/**
+	* This method encrypt input String into a MD5 String + Salt
+	* @param data: String with the information to be encrypted
+	* @param salt: String with the salt information
+	*/
 	public String encryptMd5ToString(String data, String salt) {
 
 		return bytesToHexString(encryptMd5((data + salt).getBytes()));
 	}
 
+	/**
+	* This method encrypt a byte[] input into a MD2 String
+	* @param data: String with the information to be encrypted
+	*/
 	public String encryptMd5ToString(byte[] data) {
 
 		return bytesToHexString(encryptMd5(data));
 	}
 
+	/**
+	* This method encrypt a byte[] input into a MD2 String
+	* @param data: String with the information to be encrypted
+	* @param salt: byte[] with the salt information
+	*/
 	public String encryptMd5ToString(byte[] data, byte[] salt) {
 
 		if ( data == null || salt == null ) {
@@ -180,12 +216,104 @@ public class Crypher {
 		return bytesToHexString(encryptMd5(dataSalt));
 	}
 
+	/**
+	* This method return MD5 byte[] with the encrypted information
+	* @param data: byte[] with the information to be encrypted (it can contains the data + salt)
+	*/
 	public byte[] encryptMd5(byte[] data) {
 
 		return hashTemplate(data, "MD5");
 	}
 
-	public 
+	public String encryptSha1ToString(String data) {
 
+		return encryptSha1ToString(data.getBytes());
+	}
 
+	public String encryptSha1ToString(byte[] data) {
+
+		return bytesToHexString(encryptSha1(data));
+	}
+
+	public byte[] encryptSha1(byte[] data) {
+
+		return hashTemplate(data, "SHA1");
+	}
+
+	public String encryptSha224ToString(String data) {
+
+		return encryptSha224ToString(data.getBytes());
+	}
+
+	public String encryptSha224ToString(byte[] data) {
+
+		return bytesToHexString(encryptSha224(data));
+	}
+
+	public byte[] encryptSha224(byte[] data) {
+
+		return hashTemplate(data, "SHA224");
+	}
+
+	public String encryptSha256ToString(String data) {
+
+		return encryptSha256ToString(data.getBytes());
+	}
+
+	public String encryptSha256ToString(byte[] data) {
+
+		return bytesToHexString(encryptSha256(data));
+	}
+
+	public byte[] encryptSha256(byte[] data) {
+
+		return hashTemplate(data, "SHA256");
+	}
+
+	public String encryptSha384ToString(String data) {
+
+		return encryptSha384ToString(data.getBytes());
+	}
+
+	public String encryptSha384ToString(byte[] data) {
+
+		return bytesToHexString(encryptSha384(data));
+	}
+
+	public byte[] encryptSha384(byte[] data) {
+
+		return hashTemplate(data, "SHA384");
+	}
+
+	public String encryptSha512ToString(String data) {
+
+		return encryptSha512ToString(data.getBytes());
+	}
+
+	public String encryptSha512ToString(byte[] data) {
+
+		return bytesToHexString(encryptSha512(data));
+	}
+
+	public byte[] encryptSha512(byte[] data) {
+
+		return hashTemplate(data, "SHA512");
+	}
+
+	public byte[] hashTemplate(byte[] data, String algorithm) {
+
+		if ( data == null || data.length <= 0 ) {
+			return null;
+		}
+
+		try {
+			MessageDigest md = MessageDigest.getInstance(algorithm);
+			md.update(data);
+			return md.digest();
+
+		} catch(NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }
